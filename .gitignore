@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.env
+
+# Session / Scraped HTML mock data
+cookies.txt
+attendance.html
+dashboard.html
+grade.html
+login.html
+marks.html
+marks_page.html
+papers.html
+payments_page.html
+registration_timetable.html
+seating.html
+
+# Android build intermediate cache
+android_build/bin/
+android_build/compiled/
+android_build/compiled_res.zip
+*.idsig
+
+# Editor / OS files
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/

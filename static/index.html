@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>SIS Portal - Timetable & App</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="app.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+
+  <!-- Instagram Mobile Login Screen -->
+  <div id="login-container" class="login-wrapper">
+    <div class="login-mobile-canvas">
+      
+      <!-- Subtle top locale -->
+      <div class="text-center mb-4">
+        <span class="text-secondary extra-small">English (India) <i class="fa-solid fa-chevron-down ms-1" style="font-size:0.6rem;"></i></span>
+      </div>
+
+      <!-- Mode A: Returning User One-Tap Login (Instagram Style) -->
+      <div id="login-saved-view" class="login-card text-center d-none">
+        <div class="d-flex justify-content-center mb-3">
+          <img src="favicon.png" alt="Logo" style="width: 60px; height: 60px; border-radius: 16px; box-shadow: 0 4px 18px rgba(0,180,216,0.35); background: #ffffff;">
+        </div>
+        <h1 class="ig-logo-text mb-4">SIS Portal</h1>
+
+        <div class="saved-account-card mb-4">
+          <div class="ig-story-ring mx-auto mb-3" style="width: 76px; height: 76px;">
+            <div class="ig-avatar-inner fs-3 fw-bold" id="saved-account-avatar">G</div>
+          </div>
+          <h6 class="fw-bold text-white mb-0" id="saved-account-regno">99240040465</h6>
+          <span class="text-secondary extra-small" id="saved-account-name">ESAMBADI GOUTHAM REDDY</span>
+        </div>
+
+        <button type="button" class="ig-btn-login w-100 py-2.5 mb-3" onclick="loginWithSavedAccount()">
+          <span id="saved-login-spinner" class="spinner-border spinner-border-sm d-none me-2" role="status"></span>
+          <span id="saved-login-text">Log in as 99240040465</span>
+        </button>
+
+        <button type="button" class="btn btn-link text-primary extra-small text-decoration-none fw-semibold" onclick="showBlankLoginForm()">
+          Switch accounts or Log in to another account
+        </button>
+      </div>
+
+      <!-- Mode B: Clean Blank Form for New Users or Adding Account -->
+      <div id="login-form-view" class="login-card text-center">
+        <div class="d-flex justify-content-center mb-3">
+          <img src="favicon.png" alt="Logo" style="width: 68px; height: 68px; border-radius: 18px; box-shadow: 0 4px 22px rgba(0,180,216,0.4); background: #ffffff;">
+        </div>
+        <h1 class="ig-logo-text mb-1">SIS Portal</h1>
+        <p class="text-secondary extra-small mb-4">Kalasalingam Academy of Research and Education</p>
+
+        <form id="login-form">
+          <div class="mb-3 text-start">
+            <div class="ig-input-box">
+              <input type="text" id="input-regno" class="ig-input" placeholder="Register number or username" required autocomplete="username">
+            </div>
+          </div>
+
+          <div class="mb-3 text-start">
+            <div class="ig-input-box d-flex align-items-center">
+              <input type="password" id="input-password" class="ig-input flex-fill" placeholder="Password" required autocomplete="current-password">
+              <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility()" title="Show/Hide">
+                <i id="pwd-eye-icon" class="fa-regular fa-eye-slash"></i>
+              </button>
+            </div>
+          </div>
+
+          <div id="login-alert" class="alert alert-danger d-none py-2 extra-small text-start rounded-3" role="alert"></div>
+
+          <button type="submit" id="btn-login" class="ig-btn-login w-100 py-2.5 mb-3">
+            <span id="btn-spinner" class="spinner-border spinner-border-sm d-none me-2" role="status"></span>
+            Log In
+          </button>
+
+          <div id="saved-account-back-btn" class="d-none mt-3">
+            <button type="button" class="btn btn-link text-secondary extra-small text-decoration-none" onclick="showSavedAccountView()">
+              <i class="fa-solid fa-arrow-left me-1"></i> Back to saved account
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Footer branding -->
+      <div class="text-center mt-4">
+        <span class="text-secondary extra-small">KARE Student Information System</span>
+        <div class="text-secondary extra-small mt-0.5" style="font-size:0.68rem; opacity: 0.6;">From Kalasalingam University</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Mobile App Container -->
+  <div id="app-container" class="d-none">
+    
+    <!-- Top Bar (Instagram Style) -->
+    <header class="ig-topbar sticky-top px-3 py-2">
+      <!-- Standard SIS Portal Brand Bar (Home, Attendance, Marks, Fees) -->
+      <div id="topbar-brand-view" class="d-flex align-items-center justify-content-between w-100">
+        <div class="d-flex align-items-center gap-2">
+          <img src="favicon.png" alt="Logo" style="width: 28px; height: 28px; border-radius: 8px; object-fit: cover; box-shadow: 0 0 10px rgba(0,180,216,0.45); background: #ffffff;">
+          <h2 class="ig-logo-text mb-0">SIS Portal</h2>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <button class="icon-btn" onclick="reloadActiveTab()" title="Refresh Data">
+            <i class="fa-solid fa-rotate-right text-white"></i>
+          </button>
+          <button class="icon-btn" onclick="openInstagramMenu()" title="SIS Portal Menu">
+            <i class="fa-solid fa-bars text-white fs-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Instagram Profile Topbar (When Profile Tab is Active) -->
+      <div id="topbar-profile-view" class="d-none align-items-center justify-content-between w-100">
+        <button class="profile-username-btn" onclick="openAccountSwitcher()">
+          <i class="fa-solid fa-lock text-secondary fs-6 me-1.5"></i>
+          <span id="header-profile-regno">99240040465</span>
+          <i class="fa-solid fa-chevron-down extra-small text-secondary ms-1"></i>
+        </button>
+
+        <div class="d-flex align-items-center gap-2">
+          <button class="icon-btn" onclick="addNewAccount()" title="Add / Switch Account">
+            <i class="fa-regular fa-square-plus text-white fs-5"></i>
+          </button>
+          <button class="icon-btn" onclick="openInstagramMenu()" title="Menu">
+            <i class="fa-solid fa-bars text-white fs-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Subpage / Proxy View Topbar (When Viewing Hall Ticket, Grades, Papers, etc.) -->
+      <div id="topbar-subpage-view" class="d-none align-items-center justify-content-between w-100">
+        <div class="d-flex align-items-center gap-2">
+          <button class="icon-btn" onclick="goBack()" title="Back">
+            <i class="fa-solid fa-chevron-left text-white fs-5"></i>
+          </button>
+          <span id="subpage-title" class="fw-bold fs-6 text-white text-truncate" style="max-width: 220px;">Page</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <button class="icon-btn" onclick="reloadGenericPage()" title="Reload">
+            <i class="fa-solid fa-rotate-right text-white"></i>
+          </button>
+          <button class="icon-btn" onclick="closeGenericPage()" title="Close">
+            <i class="fa-solid fa-xmark text-white fs-5"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="app-content pb-5 mb-5 px-3 pt-3">
+
+      <!-- Home Feed Tab (Official Weekly Class Timetable) -->
+      <div id="tab-content-home" class="tab-pane-view">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div>
+            <h5 class="fw-bold text-white mb-0"><i class="fa-solid fa-calendar-days text-primary me-2"></i>Weekly Class Schedule</h5>
+            <span class="text-secondary extra-small">07:00 AM - 07:00 PM (Monday to Friday)</span>
+          </div>
+          <span class="badge bg-primary-subtle text-primary extra-small">Odd Sem 2026-27</span>
+        </div>
+
+        <!-- Timetable Table View -->
+        <div class="glass-panel p-3 mb-4 rounded-4 overflow-hidden">
+          <div class="table-responsive">
+            <table class="table table-dark table-hover table-bordered mb-0 align-middle text-center extra-small">
+              <thead>
+                <tr class="table-secondary text-white">
+                  <th class="py-2.5">Day</th>
+                  <th class="py-2.5">07:00 AM<br>07:50 AM</th>
+                  <th class="py-2.5">08:00 AM<br>08:50 AM</th>
+                  <th class="py-2.5">09:00 AM<br>09:50 AM</th>
+                  <th class="py-2.5">10:00 AM<br>10:50 AM</th>
+                  <th class="py-2.5">11:00 AM<br>11:50 AM</th>
+                  <th class="py-2.5">12:00 PM<br>12:50 PM</th>
+                  <th class="py-2.5">01:00 PM<br>01:50 PM</th>
+                  <th class="py-2.5">02:00 PM<br>02:50 PM</th>
+                  <th class="py-2.5">03:00 PM<br>03:50 PM</th>
+                  <th class="py-2.5">04:00 PM<br>04:50 PM</th>
+                  <th class="py-2.5">05:00 PM<br>05:50 PM</th>
+                  <th class="py-2.5">06:00 PM<br>06:50 PM</th>
+                </tr>
+              </thead>
+              <tbody id="timetable-body">
+                <tr><td colspan="13" class="py-4 text-secondary"><div class="spinner-border spinner-border-sm me-2"></div>Loading schedule...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Course & Faculty Allocation Section -->
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h6 class="fw-bold text-white mb-0"><i class="fa-solid fa-chalkboard-user text-success me-2"></i>Course & Faculty Allocations</h6>
+          <span class="text-secondary extra-small">Faculty Handling List</span>
+        </div>
+
+        <div id="faculty-list-grid" class="row g-3">
+          <!-- Dynamic Course & Faculty Cards -->
+        </div>
+      </div>
+
+      <!-- Attendance Tab -->
+      <div id="tab-content-attendance" class="tab-pane-view d-none">
+        <div class="attendance-page-header">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <div>
+              <h4 class="fw-bold text-white mb-0">Attendance</h4>
+              <span class="text-secondary extra-small">Live Sync with KARE SIS</span>
+            </div>
+            <span class="status-pill status-pill-safe px-3 py-1.5 rounded-pill border border-success-subtle">
+              <i class="fa-solid fa-circle-check me-1"></i> Safe (>75%)
+            </span>
+          </div>
+
+          <!-- Overall Summary Hero Card on Attendance Tab -->
+          <div class="attendance-summary-hero">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="text-secondary extra-small fw-bold text-uppercase tracking-wider">Overall Aggregate</span>
+              <span class="credits-badge">5 Enrolled Courses</span>
+            </div>
+            <div class="d-flex align-items-baseline gap-2 mb-2">
+              <span id="att-summary-pct" class="display-5 fw-bold text-success">95.4%</span>
+              <span class="text-secondary small">Average Attendance</span>
+            </div>
+            <div class="progress rounded-pill mb-3" style="height: 8px; background: #1c1c1c;">
+              <div id="att-summary-bar" class="progress-bar bg-success" role="progressbar" style="width: 95.4%;"></div>
+            </div>
+            <div class="d-flex justify-content-between text-secondary extra-small">
+              <span id="att-summary-counts">234 Attended / 257 Conducted</span>
+              <span class="text-success"><i class="fa-solid fa-shield-halved me-1"></i> Above 75% Cutoff</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="attendance-grid" class="attendance-cards-list"></div>
+      </div>
+
+      <!-- Marks Tab -->
+      <div id="tab-content-marks" class="tab-pane-view d-none">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div>
+            <h4 class="fw-bold text-white mb-0">Internal Marks</h4>
+            <span class="text-secondary extra-small">Sessional & Assessments</span>
+          </div>
+        </div>
+        <div id="marks-grid" class="attendance-cards-list"></div>
+      </div>
+
+      <!-- Fees Tab -->
+      <div id="tab-content-fees" class="tab-pane-view d-none">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div>
+            <h4 class="fw-bold text-white mb-0">Fees & Receipts</h4>
+            <span class="text-secondary extra-small">Official University Receipts</span>
+          </div>
+        </div>
+        <div id="fees-grid" class="attendance-cards-list"></div>
+      </div>
+
+      <!-- Instagram Profile Page View -->
+      <div id="tab-content-profile" class="tab-pane-view d-none">
+        <div class="ig-profile-header">
+
+          <!-- Main Profile Row: Story Ring Avatar + 3 Stat Columns -->
+          <div class="profile-main-row">
+            <div class="ig-avatar-container">
+              <div class="ig-story-ring">
+                <div class="ig-avatar-inner" id="profile-avatar-letter">
+                  G
+                </div>
+              </div>
+              <div class="ig-avatar-badge" title="Verified Student">
+                <i class="fa-solid fa-graduation-cap"></i>
+              </div>
+            </div>
+
+            <div class="ig-stats-row">
+              <div class="ig-stat-item" onclick="switchTab('home', document.querySelectorAll('.nav-icon-btn')[0])" role="button" title="View Weekly Schedule">
+                <span id="profile-stat-courses" class="ig-stat-val">5</span>
+                <span class="ig-stat-lbl">Courses</span>
+              </div>
+              <div class="ig-stat-item" onclick="switchTab('attendance', document.querySelectorAll('.nav-icon-btn')[1])" role="button" title="View Attendance">
+                <span id="profile-stat-att" class="ig-stat-val text-success">91.1%</span>
+                <span class="ig-stat-lbl">Attendance</span>
+              </div>
+              <div class="ig-stat-item" onclick="switchProfileSubTab('academic')" role="button" title="View Section">
+                <span id="profile-stat-sec" class="ig-stat-val">24S05</span>
+                <span class="ig-stat-lbl">Section</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bio Section -->
+          <div class="ig-bio-section">
+            <div class="d-flex align-items-center gap-1.5 mb-0.5">
+              <h5 id="profile-page-name" class="ig-display-name mb-0">ESAMBADI GOUTHAM REDDY</h5>
+              <i class="fa-solid fa-circle-check text-primary extra-small" title="Verified SIS Student"></i>
+            </div>
+            <span id="profile-page-degree" class="ig-category-badge">B.Tech. Computer Science and Engineering</span>
+
+            <div class="ig-bio-text">
+              <div class="ig-bio-line">
+                <span class="ig-bio-emoji">🏛️</span>
+                <span>Kalasalingam Academy of Research and Education</span>
+              </div>
+              <div class="ig-bio-line">
+                <span class="ig-bio-emoji">👨‍🏫</span>
+                <span>Advisor: <strong id="profile-page-advisor" class="text-white">Dr. J. JEYA A. CELIN</strong> <span class="text-secondary extra-small">(8754915909)</span></span>
+              </div>
+              <div class="ig-bio-line">
+                <span class="ig-bio-emoji">📍</span>
+                <span id="profile-page-city">Tirupati, Andhra Pradesh, India</span>
+              </div>
+              <div class="ig-bio-line mt-1">
+                <span class="ig-bio-emoji">🔗</span>
+                <a href="https://sis.kalasalingam.ac.in" target="_blank" class="text-info text-decoration-none fw-semibold">sis.kalasalingam.ac.in</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Instagram Action Buttons -->
+          <div class="ig-action-buttons">
+            <button class="ig-btn-secondary" onclick="openAccountSwitcher()">
+              <i class="fa-solid fa-arrow-right-arrow-left"></i> Switch Account
+            </button>
+            <button class="ig-btn-secondary" onclick="openPageProxy('hallticket', 'Student Hall Ticket')">
+              <i class="fa-solid fa-id-card text-warning"></i> Hall Ticket
+            </button>
+            <button class="ig-btn-icon-only" onclick="openShareProfileModal()" title="Export Profile PDF & Share">
+              <i class="fa-solid fa-share-nodes"></i>
+            </button>
+          </div>
+
+          <!-- Story Highlights (Instagram Style) -->
+          <div class="ig-highlights-scroll">
+            <div class="ig-highlight-item" onclick="switchTab('attendance', document.querySelectorAll('.nav-icon-btn')[1])">
+              <div class="ig-highlight-ring">
+                <div class="ig-highlight-inner text-success">
+                  <i class="fa-solid fa-clipboard-user"></i>
+                </div>
+              </div>
+              <span class="ig-highlight-lbl">Attendance</span>
+            </div>
+
+            <div class="ig-highlight-item" onclick="switchTab('home', document.querySelectorAll('.nav-icon-btn')[0])">
+              <div class="ig-highlight-ring">
+                <div class="ig-highlight-inner text-primary">
+                  <i class="fa-solid fa-calendar-days"></i>
+                </div>
+              </div>
+              <span class="ig-highlight-lbl">Schedule</span>
+            </div>
+
+            <div class="ig-highlight-item" onclick="switchTab('marks', document.querySelectorAll('.nav-icon-btn')[2])">
+              <div class="ig-highlight-ring">
+                <div class="ig-highlight-inner text-warning">
+                  <i class="fa-solid fa-award"></i>
+                </div>
+              </div>
+              <span class="ig-highlight-lbl">Marks</span>
+            </div>
+
+            <div class="ig-highlight-item" onclick="switchTab('fees', document.querySelectorAll('.nav-icon-btn')[3])">
+              <div class="ig-highlight-ring">
+                <div class="ig-highlight-inner text-info">
+                  <i class="fa-solid fa-receipt"></i>
+                </div>
+              </div>
+              <span class="ig-highlight-lbl">Fees</span>
+            </div>
+
+            <div class="ig-highlight-item" onclick="openPageProxy('grade', 'Grade Sheet')">
+              <div class="ig-highlight-ring">
+                <div class="ig-highlight-inner text-danger">
+                  <i class="fa-solid fa-flag"></i>
+                </div>
+              </div>
+              <span class="ig-highlight-lbl">Grades</span>
+            </div>
+
+            <div class="ig-highlight-item" onclick="openPageProxy('hallticket', 'Student Hall Ticket')">
+              <div class="ig-highlight-ring">
+                <div class="ig-highlight-inner text-warning">
+                  <i class="fa-solid fa-id-card"></i>
+                </div>
+              </div>
+              <span class="ig-highlight-lbl">Hall Ticket</span>
+            </div>
+
+            <div class="ig-highlight-item" onclick="openPageProxy('seating', 'Seating & Time Table')">
+              <div class="ig-highlight-ring">
+                <div class="ig-highlight-inner text-secondary">
+                  <i class="fa-solid fa-chair"></i>
+                </div>
+              </div>
+              <span class="ig-highlight-lbl">Seating</span>
+            </div>
+          </div>
+
+          <!-- Profile Details Tabs Navigation (Instagram 3-Tab Style) -->
+          <div class="profile-subtabs">
+            <button class="profile-subtab-btn active" onclick="switchProfileSubTab('academic', this)">
+              <i class="fa-solid fa-table-cells"></i>
+              <span>Academic</span>
+            </button>
+            <button class="profile-subtab-btn" onclick="switchProfileSubTab('personal', this)">
+              <i class="fa-regular fa-id-card"></i>
+              <span>Student IDs</span>
+            </button>
+            <button class="profile-subtab-btn" onclick="switchProfileSubTab('contact', this)">
+              <i class="fa-regular fa-address-book"></i>
+              <span>Contact</span>
+            </button>
+          </div>
+
+          <!-- Academic Subtab -->
+          <div id="subtab-profile-academic" class="profile-info-tiles">
+            <div class="profile-tile">
+              <div class="profile-tile-left">
+                <div class="profile-tile-icon text-primary"><i class="fa-solid fa-book-bookmark"></i></div>
+                <div class="profile-tile-meta">
+                  <span class="profile-tile-lbl">Programme / Branch</span>
+                  <span id="tile-prog" class="profile-tile-val">B.Tech. Computer Science and Engineering</span>
+                </div>
+              </div>
+              <span class="badge bg-primary-subtle text-primary extra-small">Undergraduate</span>
+            </div>
+
+            <div class="profile-tile">
+              <div class="profile-tile-left">
+                <div class="profile-tile-icon text-success"><i class="fa-solid fa-layer-group"></i></div>
+                <div class="profile-tile-meta">
+                  <span class="profile-tile-lbl">Section & Batch</span>
+                  <span id="tile-batch-sec" class="profile-tile-val">Section 24S05 · Batch 2024</span>
+                </div>
+              </div>
+              <span class="badge bg-secondary-subtle text-white extra-small">2024 - 2028</span>
+            </div>
+
+            <div class="profile-tile">
+              <div class="profile-tile-left">
+                <div class="profile-tile-icon text-warning"><i class="fa-solid fa-chalkboard-user"></i></div>
+                <div class="profile-tile-meta">
+                  <span class="profile-tile-lbl">Faculty Advisor</span>
+                  <span id="tile-advisor" class="profile-tile-val">Dr. J. JEYA A. CELIN</span>
+                  <span id="tile-advisor-phone" class="text-secondary extra-small mt-0.5"><i class="fa-solid fa-phone me-1 text-success"></i>+91 8754915909</span>
+                </div>
+              </div>
+              <div class="d-flex align-items-center gap-1.5">
+                <a id="btn-call-advisor" href="tel:8754915909" class="btn-copy-tile text-success" title="Call Advisor"><i class="fa-solid fa-phone"></i></a>
+                <button class="btn-copy-tile" onclick="copyToClipboard('8754915909', 'Advisor Phone')" title="Copy Phone"><i class="fa-regular fa-copy"></i></button>
+              </div>
+            </div>
+
+            <div class="profile-tile">
+              <div class="profile-tile-left">
+                <div class="profile-tile-icon text-info"><i class="fa-solid fa-shield-check"></i></div>
+                <div class="profile-tile-meta">
+                  <span class="profile-tile-lbl">Registration Status</span>
+                  <span class="profile-tile-val text-success">Regular Approved</span>
+                </div>
+              </div>
+              <span class="badge bg-success-subtle text-success extra-small"><i class="fa-solid fa-check me-1"></i>Odd 2026-27</span>
+            </div>
+          </div>
+
+          <!-- Personal ID Subtab -->
+          <div id="subtab-profile-personal" class="profile-info-tiles d-none">
+            <div class="profile-tile">
+              <div class="profile-tile-left">
+                <div class="profile-tile-icon text-primary"><i class="fa-solid fa-id-card"></i></div>
+                <div class="profile-tile-meta">
+                  <span class="profile-tile-lbl">Register Number</span>
+                  <span id="tile-regno" class="profile-tile-val">99240040465</span>
+                </div>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary-subtle text-primary extra-small">Official</span>
+                <button class="btn-copy-tile" onclick="copyToClipboard(document.getElementById('tile-regno').textContent, 'Register Number')" title="Copy Number"><i class="fa-regular fa-copy"></i></button>
+              </div>
+            </div>
+
+            <div class="profile-tile">
+              <div class="profile-tile-left">
+                <div class="profile-tile-icon text-info"><i class="fa-solid fa-fingerprint"></i></div>
+                <div class="profile-tile-meta">
+                  <span class="profile-tile-lbl">Aadhar Number (UIDAI)</span>
+                  <span id="tile-aadhar" class="profile-tile-val">8229 0487 4686</span>
+                </div>
+              </div>
+              <div class="d-flex align-items-center gap-1.5">
+                <button class="btn-copy-tile" onclick="toggleAadharMask()" title="Show/Hide"><i id="aadhar-eye-icon" class="fa-regular fa-eye-slash"></i></button>
+                <button class="btn-copy-tile" onclick="copyToClipboard(rawAadharNumber, 'Aadhar Number')" title="Copy Aadhar"><i class="fa-regular fa-copy"></i></button>
+              </div>
+            </div>
+
+            <div class="profile-tile">
+              <div class="profile-tile-left">
+                <div class="profile-tile-icon text-warning"><i class="fa-solid fa-certificate"></i></div>
+                <div class="profile-tile-meta">
+                  <span class="profile-tile-lbl">ABC ID (Academic Bank of Credits)</span>
+                  <span id="tile-abc" class="profile-tile-val">384636732165</span>
+                </div>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-success-subtle text-success extra-small">DigiLocker</span>
+                <button class="btn-copy-tile" onclick="copyToClipboard(document.getElementById('tile-abc').textContent, 'ABC ID')" title="Copy ABC ID"><i class="fa-regular fa-copy"></i></button>
+              </div>
+            </div>
+
+            <div class="profile-tile">
+              <div class="profile-tile-left">
+                <div class="profile-tile-icon text-danger"><i class="fa-solid fa-cake-candles"></i></div>
+                <div class="profile-tile-meta">
+                  <span class="profile-tile-lbl">Date of Birth & Gender</span>
+                  <span class="profile-tile-val"><span id="tile-dob">11/05/2007</span> · <span id="tile-gender">Male</span></span>
+                </div>
+              </div>
+              <span class="badge bg-secondary-subtle text-white extra-small">Verified</span>
+            </div>
+
+            <div class="profile-tile">
+              <div class="profile-tile-left">
+                <div class="profile-tile-icon text-info"><i class="fa-solid fa-earth-americas"></i></div>
+                <div class="profile-tile-meta">
+                  <span class="profile-tile-lbl">Nationality & Social Category</span>
+                  <span id="tile-community" class="profile-tile-val">INDIAN / HINDU / OC / KAPU</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Subtab -->
+          <div id="subtab-profile-contact" class="profile-info-tiles d-none">
+            <div class="profile-tile">
+              <div class="profile-tile-left">
+                <div class="profile-tile-icon text-primary"><i class="fa-solid fa-users"></i></div>
+                <div class="profile-tile-meta">
+                  <span class="profile-tile-lbl">Parent / Guardian</span>
+                  <span id="tile-parent" class="profile-tile-val">ESAMBADI SURESH BABU</span>
+                </div>
+              </div>
+              <span class="badge bg-primary-subtle text-primary extra-small">Father</span>
+            </div>
+
+            <div class="profile-tile">
+              <div class="profile-tile-left">
+                <div class="profile-tile-icon text-danger"><i class="fa-solid fa-house"></i></div>
+                <div class="profile-tile-meta">
+                  <span class="profile-tile-lbl">Permanent Address</span>
+                  <span id="tile-address" class="profile-tile-val" style="font-size: 0.85rem; line-height: 1.45;">
+                    4-4-797/2, NEHRU NAGAR, TIRUPATI, ANDHRA PRADESH, INDIA - 517501
+                  </span>
+                </div>
+              </div>
+              <button class="btn-copy-tile" onclick="copyToClipboard(document.getElementById('tile-address').textContent.trim(), 'Permanent Address')" title="Copy Address"><i class="fa-regular fa-copy"></i></button>
+            </div>
+
+            <div class="profile-tile">
+              <div class="profile-tile-left">
+                <div class="profile-tile-icon text-info"><i class="fa-solid fa-globe"></i></div>
+                <div class="profile-tile-meta">
+                  <span class="profile-tile-lbl">Official University Portal</span>
+                  <a href="https://sis.kalasalingam.ac.in" target="_blank" class="text-info text-decoration-none fw-semibold small">https://sis.kalasalingam.ac.in</a>
+                </div>
+              </div>
+              <a href="https://sis.kalasalingam.ac.in" target="_blank" class="btn-copy-tile text-info" title="Open Portal"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Generic Proxy Page View -->
+      <div id="tab-content-generic" class="tab-pane-view d-none">
+        <div class="generic-iframe-card">
+          <iframe id="generic-page-iframe" style="width:100%; height: calc(100vh - 150px); min-height: 580px; border:none; border-radius: 16px; background: #ffffff;"></iframe>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Instagram Bottom Nav Bar -->
+    <nav class="ig-bottomnav fixed-bottom d-flex align-items-center justify-content-around py-2">
+      <button class="nav-icon-btn active" onclick="switchTab('home', this)" title="Timetable Feed">
+        <i class="fa-solid fa-house fs-4"></i>
+        <span class="extra-small d-block mt-1">Home</span>
+      </button>
+
+      <button class="nav-icon-btn" onclick="switchTab('attendance', this)" title="Attendance">
+        <i class="fa-solid fa-clipboard-user fs-4"></i>
+        <span class="extra-small d-block mt-1">Attendance</span>
+      </button>
+
+      <button class="nav-icon-btn" onclick="switchTab('marks', this)" title="Marks">
+        <i class="fa-solid fa-award fs-4"></i>
+        <span class="extra-small d-block mt-1">Marks</span>
+      </button>
+
+      <button class="nav-icon-btn" onclick="switchTab('fees', this)" title="Fees">
+        <i class="fa-solid fa-receipt fs-4"></i>
+        <span class="extra-small d-block mt-1">Fees</span>
+      </button>
+
+      <!-- Instagram Profile Icon with Long-Press -->
+      <button id="profile-tab-btn" class="nav-icon-btn" onclick="switchTab('profile', this)" title="Profile (Hold for Accounts)">
+        <div class="avatar-ring p-0.5 rounded-circle d-inline-block" style="background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));">
+          <div id="bottom-nav-avatar-letter" class="avatar bg-dark text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 24px; height: 24px; font-size: 0.75rem;">
+            D
+          </div>
+        </div>
+        <span class="extra-small d-block mt-1">Profile</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Instagram 3-Slash Menu Bottom Sheet -->
+  <div class="modal fade" id="instagramMenuModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-end modal-bottom-sheet m-0">
+      <div class="modal-content glass-panel text-white rounded-top-4 border-0">
+        <div class="modal-header border-secondary-subtle">
+          <h5 class="modal-title fw-bold fs-6"><i class="fa-solid fa-bars me-2 text-primary"></i>SIS Portal Menu</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-3 style-menu-list">
+          <div class="list-group list-group-flush bg-transparent">
+            
+            <a href="#" class="list-group-item bg-transparent text-white border-secondary-subtle d-flex align-items-center gap-3 py-2.5" onclick="openPageProxy('hallticket', 'Hall Ticket'); return false;">
+              <i class="fa-solid fa-check-double text-success"></i> <span>Hall Ticket</span> <span class="badge bg-danger ms-auto extra-small">NEW</span>
+            </a>
+            <a href="#" class="list-group-item bg-transparent text-white border-secondary-subtle d-flex align-items-center gap-3 py-2.5" onclick="openPageProxy('papers', 'Exam Papers'); return false;">
+              <i class="fa-solid fa-paperclip text-info"></i> <span>Exam Papers</span> <span class="badge bg-danger ms-auto extra-small">NEW</span>
+            </a>
+            <a href="#" class="list-group-item bg-transparent text-white border-secondary-subtle d-flex align-items-center gap-3 py-2.5" onclick="openPageProxy('revaluation', 'Revaluation'); return false;">
+              <i class="fa-solid fa-sticky-note text-warning"></i> <span>Revaluation</span>
+            </a>
+            <a href="#" class="list-group-item bg-transparent text-white border-secondary-subtle d-flex align-items-center gap-3 py-2.5" onclick="openPageProxy('registration', 'Course Registration'); return false;">
+              <i class="fa-solid fa-bell text-primary"></i> <span>Course Registration</span>
+            </a>
+            <a href="#" class="list-group-item bg-transparent text-white border-secondary-subtle d-flex align-items-center gap-3 py-2.5" onclick="openPageProxy('arrear', 'Arrear Registration'); return false;">
+              <i class="fa-solid fa-circle-exclamation text-danger"></i> <span>Arrear Registration</span> <span class="badge bg-danger ms-auto extra-small">NEW</span>
+            </a>
+            <a href="#" class="list-group-item bg-transparent text-white border-secondary-subtle d-flex align-items-center gap-3 py-2.5" onclick="openPageProxy('grade', 'Grade Sheet'); return false;">
+              <i class="fa-solid fa-flag text-warning"></i> <span>Grade Sheet</span>
+            </a>
+            <a href="#" class="list-group-item bg-transparent text-white border-secondary-subtle d-flex align-items-center gap-3 py-2.5" onclick="openPageProxy('seating', 'Seating & Time Table'); return false;">
+              <i class="fa-solid fa-calendar-days text-info"></i> <span>Seating & Time Table</span>
+            </a>
+            <a href="#" class="list-group-item bg-transparent text-white border-secondary-subtle d-flex align-items-center gap-3 py-2.5" onclick="openPageProxy('circulars', 'Circulars'); return false;">
+              <i class="fa-solid fa-bullhorn text-secondary"></i> <span>Circulars</span>
+            </a>
+            <a href="#" class="list-group-item bg-transparent text-white border-secondary-subtle d-flex align-items-center gap-3 py-2.5" onclick="openPageProxy('course_feedback', 'Course Feedback'); return false;">
+              <i class="fa-solid fa-comment-dots text-success"></i> <span>Course Feedback</span> <span class="badge bg-danger ms-auto extra-small">NEW</span>
+            </a>
+
+            <div class="my-2 border-top border-secondary-subtle"></div>
+
+            <a href="#" class="list-group-item bg-transparent text-white border-0 d-flex align-items-center gap-3 py-2.5" onclick="openAccountSwitcher(); return false;">
+              <i class="fa-solid fa-users text-primary"></i> <span>Switch Account</span>
+            </a>
+            <a href="#" class="list-group-item bg-transparent text-danger border-0 d-flex align-items-center gap-3 py-2.5" onclick="logoutCurrentAccount(); return false;">
+              <i class="fa-solid fa-right-from-bracket"></i> <span>Log Out</span>
+            </a>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Instagram Account Switcher Bottom Sheet Modal -->
+  <div class="modal fade" id="accountSwitcherModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-end modal-bottom-sheet m-0">
+      <div class="modal-content ig-sheet-content text-white rounded-top-4 border-0">
+        <!-- Drag pill handle -->
+        <div class="ig-sheet-handle"></div>
+
+        <div class="modal-header border-0 pb-2 pt-1 px-4 d-flex align-items-center justify-content-between">
+          <h5 class="modal-title fw-bold fs-6 mb-0 text-white">Switch accounts</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body px-3 py-2">
+          <!-- Accounts List -->
+          <div id="accounts-list" class="d-flex flex-column gap-2 mb-3"></div>
+          
+          <!-- Instagram Style Add Account Row -->
+          <button class="ig-sheet-action-row" onclick="addNewAccount()">
+            <div class="ig-add-icon-circle">
+              <i class="fa-solid fa-plus"></i>
+            </div>
+            <span class="fw-semibold text-white small">Log into another account</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share & Export Profile PDF Modal (Instagram Bottom Sheet) -->
+  <div class="modal fade" id="shareProfileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-end modal-bottom-sheet m-0">
+      <div class="modal-content ig-sheet-content text-white rounded-top-4 border-0">
+        <!-- Drag pill handle -->
+        <div class="ig-sheet-handle"></div>
+
+        <div class="modal-header border-0 pb-1 pt-1 px-3 d-flex align-items-center justify-content-between">
+          <div>
+            <h5 class="modal-title fw-bold fs-6 mb-0 text-white"><i class="fa-solid fa-file-pdf text-danger me-2"></i>Export Profile PDF</h5>
+            <span class="text-secondary extra-small">Select details to include in your summary document</span>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body p-3 pt-2">
+          <!-- Quick toggle bar -->
+          <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+            <span class="extra-small text-secondary fw-semibold">INCLUDED SECTIONS</span>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-link text-primary p-0 extra-small text-decoration-none fw-semibold" onclick="toggleAllShareOptions(true)">Select All</button>
+              <span class="text-secondary extra-small">·</span>
+              <button type="button" class="btn btn-link text-secondary p-0 extra-small text-decoration-none fw-semibold" onclick="toggleAllShareOptions(false)">Clear</button>
+            </div>
+          </div>
+
+          <!-- Options List with checkboxes -->
+          <div class="d-flex flex-column gap-2 mb-3" id="share-options-list">
+            
+            <label class="ig-checkbox-item">
+              <div class="d-flex align-items-center gap-3">
+                <div class="ig-check-icon text-primary"><i class="fa-solid fa-id-badge"></i></div>
+                <div>
+                  <div class="fw-semibold text-white small">Personal Information</div>
+                  <div class="text-secondary extra-small">Name, Register Number, Profile Photo Initial</div>
+                </div>
+              </div>
+              <input type="checkbox" id="share-opt-personal" class="form-check-input ig-custom-check" checked>
+            </label>
+
+            <label class="ig-checkbox-item">
+              <div class="d-flex align-items-center gap-3">
+                <div class="ig-check-icon text-info"><i class="fa-solid fa-graduation-cap"></i></div>
+                <div>
+                  <div class="fw-semibold text-white small">Academic & Section</div>
+                  <div class="text-secondary extra-small">B.Tech CSE, Section 24S05, Batch 2024</div>
+                </div>
+              </div>
+              <input type="checkbox" id="share-opt-academic" class="form-check-input ig-custom-check" checked>
+            </label>
+
+            <label class="ig-checkbox-item">
+              <div class="d-flex align-items-center gap-3">
+                <div class="ig-check-icon text-success"><i class="fa-solid fa-clipboard-user"></i></div>
+                <div>
+                  <div class="fw-semibold text-white small">Attendance Report</div>
+                  <div class="text-secondary extra-small">Overall % rate, Attended vs Conducted</div>
+                </div>
+              </div>
+              <input type="checkbox" id="share-opt-attendance" class="form-check-input ig-custom-check" checked>
+            </label>
+
+            <label class="ig-checkbox-item">
+              <div class="d-flex align-items-center gap-3">
+                <div class="ig-check-icon text-warning"><i class="fa-solid fa-chalkboard-user"></i></div>
+                <div>
+                  <div class="fw-semibold text-white small">Faculty Advisor Details</div>
+                  <div class="text-secondary extra-small">Dr. J. JEYA A. CELIN (+91 8754915909)</div>
+                </div>
+              </div>
+              <input type="checkbox" id="share-opt-advisor" class="form-check-input ig-custom-check" checked>
+            </label>
+
+            <label class="ig-checkbox-item">
+              <div class="d-flex align-items-center gap-3">
+                <div class="ig-check-icon text-danger"><i class="fa-solid fa-fingerprint"></i></div>
+                <div>
+                  <div class="fw-semibold text-white small">Official IDs & Registry</div>
+                  <div class="text-secondary extra-small">Aadhar Number, ABC ID, DOB, Gender, Community</div>
+                </div>
+              </div>
+              <input type="checkbox" id="share-opt-ids" class="form-check-input ig-custom-check" checked>
+            </label>
+
+            <label class="ig-checkbox-item">
+              <div class="d-flex align-items-center gap-3">
+                <div class="ig-check-icon text-secondary"><i class="fa-solid fa-house"></i></div>
+                <div>
+                  <div class="fw-semibold text-white small">Contact & Residential Address</div>
+                  <div class="text-secondary extra-small">Parent name and full permanent address</div>
+                </div>
+              </div>
+              <input type="checkbox" id="share-opt-contact" class="form-check-input ig-custom-check" checked>
+            </label>
+
+            <label class="ig-checkbox-item">
+              <div class="d-flex align-items-center gap-3">
+                <div class="ig-check-icon text-primary"><i class="fa-solid fa-book-bookmark"></i></div>
+                <div>
+                  <div class="fw-semibold text-white small">Semester Course Allocations</div>
+                  <div class="text-secondary extra-small">Enrolled subjects & faculty in charge</div>
+                </div>
+              </div>
+              <input type="checkbox" id="share-opt-courses" class="form-check-input ig-custom-check" checked>
+            </label>
+
+          </div>
+
+          <!-- Action Buttons in Sheet -->
+          <div class="d-flex flex-column gap-2 pt-1">
+            <button class="btn btn-primary w-100 py-2.5 rounded-3 fw-bold d-flex align-items-center justify-content-center gap-2" onclick="downloadSelectedProfilePDF()">
+              <i class="fa-solid fa-file-arrow-down"></i> Download Official PDF
+            </button>
+
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-success flex-fill py-2 rounded-3 fw-semibold small d-flex align-items-center justify-content-center gap-2" onclick="shareProfileToWhatsApp()">
+                <i class="fa-brands fa-whatsapp fs-6"></i> WhatsApp
+              </button>
+              <button class="btn btn-outline-light flex-fill py-2 rounded-3 fw-semibold small d-flex align-items-center justify-content-center gap-2" onclick="shareProfileNativeOrPrint()">
+                <i class="fa-solid fa-print fs-6"></i> Print / Save
+              </button>
+              <button class="btn btn-outline-secondary flex-fill py-2 rounded-3 fw-semibold small d-flex align-items-center justify-content-center gap-2" onclick="copySelectedProfileText()">
+                <i class="fa-regular fa-copy fs-6"></i> Copy Text
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden Printable PDF Container for html2pdf & Print -->
+  <div id="pdf-printable-container" style="position: fixed; left: -9999px; top: 0; width: 794px; z-index: -999; background: #ffffff; color: #111111;"></div>
+
+  <!-- Floating Toast Notification (Instagram Style) -->
+  <div id="ig-toast" class="ig-toast d-none">
+    <i class="fa-solid fa-circle-check text-success me-2"></i>
+    <span id="ig-toast-text">Copied to clipboard</span>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
